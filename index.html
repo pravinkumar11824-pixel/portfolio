@@ -28,8 +28,9 @@
 
     <style>
         :root {
-            /* Palette: Deep Space */
-            --bg-dark: #050510;
+            /* Palette: Deep Space (Default Dark) */
+            --bg-body: #050510;
+            --bg-nav: rgba(5, 5, 16, 0.8);
             --bg-card: rgba(255, 255, 255, 0.03);
             --bg-card-hover: rgba(255, 255, 255, 0.07);
             --border-color: rgba(255, 255, 255, 0.1);
@@ -40,7 +41,7 @@
             --secondary: #7000ff;
             /* Electric Purple */
             --accent: #ff0055;
-            /* Hot Pink (for highlights) */
+            /* Hot Pink */
 
             /* Text */
             --text-main: #ffffff;
@@ -55,6 +56,32 @@
             --glass-blur: blur(12px);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             --shadow-glow: 0 0 20px rgba(0, 240, 255, 0.15);
+            --theme-icon: "🌙";
+        }
+
+        [data-theme="light"] {
+            /* Palette: Clean Day (Light Mode) */
+            --bg-body: #f4f7fa;
+            --bg-nav: rgba(255, 255, 255, 0.85);
+            --bg-card: rgba(255, 255, 255, 0.65);
+            --bg-card-hover: rgba(255, 255, 255, 0.9);
+            --border-color: rgba(0, 0, 0, 0.08);
+
+            /* Accents (Adjusted for contrast) */
+            --primary: #00b4d8;
+            /* Darker Cyan */
+            --secondary: #6200ea;
+            /* Deep Purple */
+            --accent: #e91e63;
+            /* Pink */
+
+            /* Text */
+            --text-main: #1a1a2e;
+            --text-muted: #555565;
+            --text-dim: #888899;
+
+            --shadow-glow: 0 5px 20px rgba(0, 180, 216, 0.15);
+            --theme-icon: "☀️";
         }
 
         * {
@@ -69,10 +96,11 @@
 
         body {
             font-family: var(--font-body);
-            background-color: var(--bg-dark);
+            background-color: var(--bg-body);
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
         /* --- Ambient Background --- */
@@ -186,7 +214,7 @@
 
         nav.scrolled {
             padding: 1rem 0;
-            background: rgba(5, 5, 16, 0.8);
+            background: var(--bg-nav);
             backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid var(--border-color);
         }
@@ -250,6 +278,30 @@
             font-size: 1.5rem;
             color: var(--text-main);
             cursor: pointer;
+            margin-left: 1.5rem;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            transition: var(--transition);
+            margin-left: 2rem;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
         }
 
         /* --- Hero Section --- */
@@ -824,8 +876,14 @@
                 <li><a href="#education">Education</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-            <div class="hamburger">
-                <i class="ri-menu-4-line"></i>
+
+            <div style="display: flex; align-items: center;">
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <i class="ri-moon-line"></i>
+                </button>
+                <div class="hamburger">
+                    <i class="ri-menu-4-line"></i>
+                </div>
             </div>
         </div>
     </nav>
@@ -1149,6 +1207,41 @@
     </footer>
 
     <script>
+        // --- Theme Switcher ---
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const htmlElement = document.documentElement;
+
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+
+        const applyTheme = (theme) => {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+
+            // update icon
+            if (theme === 'light') {
+                themeIcon.className = 'ri-sun-line';
+            } else {
+                themeIcon.className = 'ri-moon-line';
+            }
+        };
+
+        // Initialize
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme(systemTheme);
+        }
+
+        // Event Listener
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+        });
+
         // --- Sticky Navbar with Glass Effect ---
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
